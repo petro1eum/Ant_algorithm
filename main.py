@@ -10,7 +10,7 @@ def total_desire(distance, feromones):
 
 # функция для расчета нормированного удовольствия каждого муравья
 def desire(choice, distance, feromones):
-    desire = ((distance[choice, :] ** input_data.beta) * (feromones[choice, :] ** input_data.alfa)) / np.nansum(total_desire(distance, feromones)[choice, :])
+    desire = total_desire(distance, feromones)[choice, :] / np.nansum(total_desire(distance, feromones)[choice, :])
     return desire
 
 
@@ -30,14 +30,11 @@ def null_feromones(choice_list):
     return feromones
 
 
-# берем на вход обрезанный массив и подаем его на вход в функцию расчета удовольствия
+# расчет значений удовольстия от текущего выбора до оставшихся городов
 def next_city(choice_list, choice):
     distance = null_distance(choice_list)
-    #    print(distance, 'distance')
     feromones = null_feromones(choice_list)
-    #    print(feromones, 'feromones')
-    local_desire = desire(choice, distance, feromones)  # отнимаем длину, чтобы не пересчитывать вручную номер столбца
-    #    print(local_desire, 'local_desire')
+    local_desire = desire(choice, distance, feromones)
     return local_desire
 
 
@@ -49,15 +46,5 @@ def roulette():
 
 choice_list = [0, 3, 7, 4]
 
-k = null_distance(choice_list)
-j = null_feromones(choice_list)
-
-y = desire(8, k, j)
-
-print(y, 'total desire')
-
-print('place holder')
-
-
-k = next_city([choice_list], 3)  # choice_list - колонки в изначальной теблице, choice - новая колонка в обрезанном наборе
-print('Next City #:', k)
+k = next_city([choice_list], 8)
+print('Pleasure to remaining cities:', k)
