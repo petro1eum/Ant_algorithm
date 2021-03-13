@@ -27,3 +27,5 @@ feromones = np.array(feromones)
 
 alfa = 1
 beta = 4
+
+route = np.array(distance)
