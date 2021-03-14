@@ -25,6 +25,7 @@ feromones = [[0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
 distance = np.array(distance)
 feromones = np.array(feromones)
 
+
 alfa = 1
 beta = 4
 
