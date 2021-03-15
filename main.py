@@ -3,39 +3,39 @@ from datasets import input_data
 
 
 # функция для расчета суммы удовольствия муравьёв
-def total_desire(distance, feromones):
-    total_desire = ((distance ** input_data.beta) * (feromones ** input_data.alfa))
+def total_desire(distance1, feromones):
+    total_desire = ((distance1 ** input_data.beta) * (feromones ** input_data.alfa))
     return total_desire
 
 
 # расчет значений удовольстия от текущего выбора до всех городов в строке
-def desire(choice, distance, feromones):
+def desire(choice, distance1, feromones):
     np.seterr(divide='ignore', invalid='ignore')  # игнор ошибок деления на NaN
-    desire = total_desire(distance, feromones)[choice, :] / np.nansum(total_desire(distance, feromones)[choice, :])
+    desire = total_desire(distance1, feromones)[choice, :] / np.nansum(total_desire(distance1, feromones)[choice, :])
     return desire
 
 
 def null_distance(choice_list):
-    distance = input_data.distance
+    var_distance = np.array(input_data.track)  # тут трахался три дня, т.к. input_data.distance после вычислений -> nan
     for n in choice_list:
-        distance[:, n] = np.nan  # убираем значения пересчитанных городов
-        distance[n, :] = np.nan
-    return distance
+        var_distance[:, n] = np.nan  # убираем значения пересчитанных городов
+        var_distance[n, :] = np.nan
+    return var_distance
 
 
 def null_feromones(choice_list):
-    feromones = input_data.feromones
+    var_feromones = np.array(input_data.feromes)
     for n in choice_list:
-        feromones[:, n] = np.nan
-        feromones[n, :] = np.nan
-    return feromones
+        var_feromones[:, n] = np.nan
+        var_feromones[n, :] = np.nan
+    return var_feromones
 
 
 # расчет значений удовольстия от текущего выбора до оставшихся городов
 def next_city(choice_list, choice):
-    distance = null_distance(choice_list)
-    feromones = null_feromones(choice_list)
-    local_desire = desire(choice, distance, feromones)
+    loc_distance = null_distance(choice_list)
+    loc_feromones = null_feromones(choice_list)
+    local_desire = desire(choice, loc_distance, loc_feromones)
     return local_desire
 
 
@@ -62,12 +62,12 @@ def roulette():
 def roulette_run(local_desire):
     moving_value = 0
     chance = roulette()
-    print('значение рулетки:', chance)
+#    print('значение рулетки:', chance)
     for value in range(0, len(local_desire)):
         if np.isnan(local_desire[value]) == False:
             moving_value = local_desire[value] + moving_value
             if moving_value >= chance:
-                print('накопленная сумма =', moving_value)
+#                print('накопленная сумма =', moving_value)
                 break
 
     return int(value)
@@ -80,27 +80,36 @@ def update_choice(choice_list, choice):  # необходимо определи
 
 
 # первый выбор задается вручную
-distance_matrix = []
+distance_list = []
+choice_list = []
+choice_set = {}
+choice = 0
+first_choice = choice
 
-for m in range(3):
-        choice_list = []
-        choice = 0
-        first_choice = 0
-        distance = input_data.route
-        feromones = input_data.feromones
-        for value in range(0, len(input_data.distance)):
-            print('матрица выбора', next_city(choice_list, choice))
-            new_choice = roulette_run(next_city(choice_list, choice))
-            print('new choice', new_choice)
-            choice_list = update_choice(choice_list, choice)
-            print('новый choice_list', choice_list)
-            choice = new_choice
-        choice_list = np.array(np.append(choice_list, first_choice), dtype=int)
-        print('новый choice_list', choice_list.tolist())
-        k = travel_calc(choice_list)
-        distance_matrix = np.array(np.append(distance_matrix, k), dtype=int)
+for m in range(50):
+    for value in range(0, len(input_data.track)):
+#        print('value', value, choice_list, choice)
+#        print('матрица выбора', next_city(choice_list, choice))
+        new_choice = roulette_run(next_city(choice_list, choice))
+#        print('new choice', new_choice)
+        choice_list = update_choice(choice_list, choice)
+#        print('новый choice_list', choice_list)
+        choice = new_choice
 
-print('call function travel_calc', distance_matrix)
+    choice_list = np.array(np.append(choice_list, first_choice), dtype=int)
+#    print('новый choice_list', choice_list.tolist())
+    k = travel_calc(choice_list)
+    distance_matrix = {
+        k: choice_list
+    }
+    distance_list.append(distance_matrix)
+    choice_list = []
+    choice = 0
+    first_choice = choice
+
+print(distance_list)
+
+
 
 
 
