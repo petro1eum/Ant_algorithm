@@ -86,7 +86,7 @@ choice_set = {}
 choice = 0
 first_choice = choice
 
-for m in range(50):
+for m in range(5000):
     for value in range(0, len(input_data.track)):
 #        print('value', value, choice_list, choice)
 #        print('матрица выбора', next_city(choice_list, choice))
@@ -107,7 +107,14 @@ for m in range(50):
     choice = 0
     first_choice = choice
 
-print(distance_list)
+# Сортировка distance_list по возрастанию значений расстояний
+sorted_distance_list = sorted(distance_list, key=lambda x: list(x.keys())[0])
+
+# Вывод двух результатов с минимальным расстоянием
+print("Два результата с минимальным расстоянием:")
+for i in range(2):
+    distance, route = list(sorted_distance_list[i].items())[0]
+    print(f"Расстояние: {distance}, Маршрут: {route}")
 
 
 
